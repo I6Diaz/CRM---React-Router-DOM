@@ -7,6 +7,14 @@ export async function action({ request }) {
 
     const datos = Object.fromEntries(formData)
 
+    const email = formData.get('email')
+
+    let regex = new RegExp("([!#-'*+/-9=?A-Z^-~-]+(\.[!#-'*+/-9=?A-Z^-~-]+)*|\"\(\[\]!#-[^-~ \t]|(\\[\t -~]))+\")@([!#-'*+/-9=?A-Z^-~-]+(\.[!#-'*+/-9=?A-Z^-~-]+)*|\[[\t -Z^-~]*])");
+
+    if(!regex.test(email)) {
+        errores.push('El Email no es valido')
+    }
+
     //Validación
     const errores = []
     if (Object.values(datos).includes('')) {
@@ -44,6 +52,7 @@ function NuevoCliente() {
 
                 <Form
                     method='post'
+                    noValidate
                 >
                     <Formulario />
 
