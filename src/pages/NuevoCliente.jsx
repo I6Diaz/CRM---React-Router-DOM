@@ -1,30 +1,32 @@
-import { useNavigate, Form, useActionData } from "react-router-dom"
+import { useNavigate, Form, useActionData, redirect } from "react-router-dom"
 import Formulario from "../components/Formulario"
 import Error from "../components/Error"
+import { agregarClientes } from "../api/clientes"
 
 export async function action({ request }) {
     const formData = await request.formData()
-
     const datos = Object.fromEntries(formData)
-
     const email = formData.get('email')
 
-    let regex = new RegExp("([!#-'*+/-9=?A-Z^-~-]+(\.[!#-'*+/-9=?A-Z^-~-]+)*|\"\(\[\]!#-[^-~ \t]|(\\[\t -~]))+\")@([!#-'*+/-9=?A-Z^-~-]+(\.[!#-'*+/-9=?A-Z^-~-]+)*|\[[\t -Z^-~]*])");
+     //Validación
+     const errores = []
+     if (Object.values(datos).includes('')) {
+         errores.push('Todos los campos son obligatorios')
+     }
+ 
 
+    let regex = new RegExp("([!#-'*+/-9=?A-Z^-~-]+(\.[!#-'*+/-9=?A-Z^-~-]+)*|\"\(\[\]!#-[^-~ \t]|(\\[\t -~]))+\")@([!#-'*+/-9=?A-Z^-~-]+(\.[!#-'*+/-9=?A-Z^-~-]+)*|\[[\t -Z^-~]*])");
     if(!regex.test(email)) {
         errores.push('El Email no es valido')
     }
-
-    //Validación
-    const errores = []
-    if (Object.values(datos).includes('')) {
-        errores.push('Todos los campos son obligatorios')
-    }
-
+   
     //Retornar errores
     if (Object.keys(errores).lenght) {
         return errores
     }
+
+   await agregarClientes(datos)
+   return redirect('/')
 }
 
 function NuevoCliente() {
@@ -32,7 +34,7 @@ function NuevoCliente() {
     const errores = useActionData()
     const navigate = useNavigate()
 
-    console.log(errores)
+    
     return (
         <>
             <h1 className='font-black text-4xl text-blue-900'>Nuevo cliente</h1>
@@ -40,7 +42,7 @@ function NuevoCliente() {
 
             <div className='flex justify-end'>
                 <button className='bg-blue-800 text-white px-3 py-1 font-bold uppercase'
-                    onClick={() => navigate('/')}>
+                    onClick={() => navigate(-1)}>
                     Volver
                 </button>
             </div>
