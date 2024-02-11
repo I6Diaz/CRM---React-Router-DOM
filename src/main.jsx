@@ -4,8 +4,9 @@ import './index.css'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Layout from './components/Layout'
 import NuevoCliente, { action as nuevoClienteAction } from './pages/NuevoCliente'
-import EditarCliente, { loader as editarClienteLoader} from './pages/EdidarCliente'
+import EditarCliente, { loader as editarClienteLoader, action as editarClienteAction} from './pages/EdidarCliente'
 import Index, { loader as clientesLoader } from './pages/Index'
+import { action as eliminarClienteAction } from './components/Cliente'
 import ErrorPage from './components/ErrorPage'
 
 const router = createBrowserRouter([
@@ -17,18 +18,24 @@ const router = createBrowserRouter([
         index: true,
         element: <Index />,
         loader: clientesLoader,
-        errorElement : <ErrorPage />
+        errorElement: <ErrorPage />
       },
       {
         path: '/clientes/nuevo',
         element: <NuevoCliente />,
-        action: nuevoClienteAction
+        action: nuevoClienteAction,
+        errorElement: <ErrorPage />
       },
       {
         path: '/clientes/:clienteId/edidar',
         element: <EditarCliente />,
         loader: editarClienteLoader,
-        errorElement : <ErrorPage />
+        action: editarClienteAction,
+        errorElement: <ErrorPage />
+      },
+      {
+        path: '/clientes/:clienteId/eliminar',
+        action: eliminarClienteAction
       }
     ]
   },

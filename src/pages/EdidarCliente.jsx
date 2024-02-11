@@ -1,23 +1,51 @@
-import { Form, useLoaderData, useNavigate } from 'react-router-dom'
-import { obtenerCliente } from "../api/clientes"
+import { Form, useActionData, useLoaderData, useNavigate, redirect } from 'react-router-dom'
+import { obtenerCliente, actualizarCliente } from "../api/clientes"
 import Formulario from "../components/Formulario"
+import Error from '../components/Error'
 
 export async function loader({ params }) {
     const cliente = await obtenerCliente(params.clienteId)
     if (Object.values(cliente).lenght === 0) {
         throw new Response('', {
             status: 404,
-            statusText: 'No hay resultados'
+            statusText: 'El cliente no ha sido encontrado'
         })
     }
     return cliente
 }
 
+export async function action({request, params}) {
+    const formData = await request.formData()
+    const datos = Object.fromEntries(formData)
+    const email = formData.get('email')
 
-const EditarCliente = function () {
+     //Validación
+     const errores = []
+     if (Object.values(datos).includes('')) {
+         errores.push('Todos los campos son obligatorios')
+     }
+ 
+
+    let regex = new RegExp("([!#-'*+/-9=?A-Z^-~-]+(\.[!#-'*+/-9=?A-Z^-~-]+)*|\"\(\[\]!#-[^-~ \t]|(\\[\t -~]))+\")@([!#-'*+/-9=?A-Z^-~-]+(\.[!#-'*+/-9=?A-Z^-~-]+)*|\[[\t -Z^-~]*])");
+    if(!regex.test(email)) {
+        errores.push('El Email no es valido')
+    }
+   
+    //Retornar errores
+    if (Object.keys(errores).lenght) {
+        return errores
+    }
+
+    // Actualizar el cliente
+   await actualizarCliente(params.clienteId, datos)
+   return redirect('/')
+}
+
+function EditarCliente() {
     const navigate = useNavigate()
     const cliente = useLoaderData()
-    
+    const errores = useActionData()
+
     return (
         <>
             <h1 className='font-black text-4xl text-blue-900'>Editar cliente</h1>
@@ -33,20 +61,20 @@ const EditarCliente = function () {
 
             <div className='bg-white shadow rounded-md md:3/4 mx-auto px-5 py-10 mt-20'>
 
-              {/*errores?.length && errores.map((error, i) => <Error key={i}>{error}</Error>)*/}
+                {errores?.length && errores.map((error, i) => <Error key={i}>{error}</Error>)}
 
                 <Form
                     method='post'
                     noValidate
                 >
-                    <Formulario 
-                    cliente={cliente}
+                    <Formulario
+                        cliente={cliente}
                     />
 
                     <input
                         type='submit'
                         className='mt-5 w-full bg-blue-800 p-3 uppercase font-bold text-white text-lg'
-                        value='Registrar cliente'
+                        value='Guardar cambios'
                     />
                 </Form>
             </div>

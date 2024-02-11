@@ -5,15 +5,11 @@ import Cliente from "../components/Cliente";
 
 export function loader() {
    const clientes = obtenerClientes()
-
-    return clientes;
-   
+    return clientes   
 }
 
 function Index() {
-
     const clientes = useLoaderData()
-
 
     return (
         <>
